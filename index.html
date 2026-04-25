@@ -462,6 +462,73 @@ table { border-collapse: collapse; width: 100%; }
 ::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: var(--radius-full); }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-text-faint); }
 
+/* ===== PIE CHART / DEMAND SECTION ===== */
+.demand-section {
+  padding: var(--space-4) var(--space-4) 0;
+  margin-bottom: var(--space-3);
+}
+.demand-title {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.demand-title svg { color: var(--color-primary); }
+.demand-charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  align-items: start;
+}
+@media (max-width: 480px) {
+  .demand-charts { grid-template-columns: 1fr; }
+}
+.demand-chart-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+}
+.demand-chart-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-text-faint);
+  margin-bottom: var(--space-3);
+  font-weight: 600;
+}
+.demand-chart-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 200px;
+  margin: 0 auto;
+}
+.demand-legend {
+  margin-top: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.demand-legend-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+.demand-legend-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+.demand-legend-left { display: flex; align-items: center; }
+.demand-legend-val { font-weight: 600; color: var(--color-text); font-variant-numeric: tabular-nums; }
+
 /* ===== PRICE CHANGE ANIMATION ===== */
 @keyframes price-flash {
   0% { background: color-mix(in oklch, var(--color-primary) 30%, transparent); }
@@ -469,6 +536,7 @@ table { border-collapse: collapse; width: 100%; }
 }
 .price-changed { animation: price-flash 1.5s ease-out; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -602,6 +670,25 @@ table { border-collapse: collapse; width: 100%; }
 
 <!-- AGGREGATE VIEW -->
 <div id="viewAgg" style="display:none;">
+  <!-- DEMAND PIE CHARTS -->
+  <div class="demand-section">
+    <div class="demand-title">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+      Demand Analysis
+    </div>
+    <div class="demand-charts">
+      <div class="demand-chart-card">
+        <div class="demand-chart-label">Sold by Type</div>
+        <div class="demand-chart-wrap"><canvas id="pieSoldByType" height="200"></canvas></div>
+        <div class="demand-legend" id="legendSoldByType"></div>
+      </div>
+      <div class="demand-chart-card">
+        <div class="demand-chart-label">Available by Type</div>
+        <div class="demand-chart-wrap"><canvas id="pieAvailByType" height="200"></canvas></div>
+        <div class="demand-legend" id="legendAvailByType"></div>
+      </div>
+    </div>
+  </div>
   <div class="agg-grid" id="aggGrid"></div>
 </div>
 
@@ -999,6 +1086,75 @@ function renderAgg() {
   }).join('');
 
   grid.innerHTML += floorCards;
+
+  // Render demand pie charts after DOM is updated
+  setTimeout(() => renderDemandCharts(data), 0);
+}
+
+// ===== PIE CHARTS =====
+let chartSold = null;
+let chartAvail = null;
+
+function getChartColors(isDark) {
+  return {
+    STUDIO: isDark ? '#4f98a3' : '#01696f',
+    '1BHK':  isDark ? '#e8af34' : '#c98a00',
+    '2BHK':  isDark ? '#a78bfa' : '#7c3aed',
+  };
+}
+
+function renderDemandCharts(data) {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const colors = getChartColors(isDark);
+  const types = ['STUDIO', '1BHK', '2BHK'];
+  const textColor = isDark ? '#797876' : '#7a7974';
+
+  const soldCounts  = types.map(t => data.filter(u => u.unit_type === t && u.sold).length);
+  const availCounts = types.map(t => data.filter(u => u.unit_type === t && !u.sold).length);
+  const bgColors    = types.map(t => colors[t]);
+
+  const chartOpts = (counts, legendId) => ({
+    type: 'doughnut',
+    data: {
+      labels: types,
+      datasets: [{ data: counts, backgroundColor: bgColors, borderWidth: 2,
+        borderColor: isDark ? '#1c1b19' : '#f9f8f5', hoverOffset: 6 }]
+    },
+    options: {
+      responsive: true,
+      cutout: '62%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.label}: ${ctx.parsed} (${Math.round(ctx.parsed / counts.reduce((a,b)=>a+b,0) * 100)}%)`
+          }
+        }
+      }
+    }
+  });
+
+  // Sold chart
+  const ctxS = document.getElementById('pieSoldByType').getContext('2d');
+  if (chartSold) chartSold.destroy();
+  chartSold = new Chart(ctxS, chartOpts(soldCounts, 'legendSoldByType'));
+  const totalSold = soldCounts.reduce((a,b)=>a+b,0);
+  document.getElementById('legendSoldByType').innerHTML = types.map((t,i) =>
+    `<div class="demand-legend-item">
+      <span class="demand-legend-left"><span class="demand-legend-dot" style="background:${bgColors[i]}"></span>${t}</span>
+      <span class="demand-legend-val">${soldCounts[i]} <span style="color:var(--color-text-faint);font-weight:400">(${totalSold ? Math.round(soldCounts[i]/totalSold*100) : 0}%)</span></span>
+    </div>`).join('');
+
+  // Available chart
+  const ctxA = document.getElementById('pieAvailByType').getContext('2d');
+  if (chartAvail) chartAvail.destroy();
+  chartAvail = new Chart(ctxA, chartOpts(availCounts, 'legendAvailByType'));
+  const totalAvail = availCounts.reduce((a,b)=>a+b,0);
+  document.getElementById('legendAvailByType').innerHTML = types.map((t,i) =>
+    `<div class="demand-legend-item">
+      <span class="demand-legend-left"><span class="demand-legend-dot" style="background:${bgColors[i]}"></span>${t}</span>
+      <span class="demand-legend-val">${availCounts[i]} <span style="color:var(--color-text-faint);font-weight:400">(${totalAvail ? Math.round(availCounts[i]/totalAvail*100) : 0}%)</span></span>
+    </div>`).join('');
 }
 
 // ===== STATS BAR =====
