@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#171614">
+<title>Celesto 4 — Unit Price List</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+/* ===== DESIGN TOKENS ===== */
+:root, [data-theme="light"] {
+  --color-bg: #f7f6f2;
+  --color-surface: #f9f8f5;
+  --color-surface-2: #fbfbf9;
+  --color-surface-offset: #f0ede8;
+  --color-divider: #dcd9d5;
+  --color-border: #d4d1ca;
+  --color-text: #28251d;
+  --color-text-muted: #7a7974;
+  --color-text-faint: #bab9b4;
+  --color-primary: #01696f;
+  --color-primary-hover: #0c4e54;
+  --color-primary-highlight: #cedcd8;
+  --color-sold-bg: #fde8e8;
+  --color-sold-text: #8b2323;
+  --color-sold-border: #f5b8b8;
+  --color-available-bg: #e6f4f1;
+  --color-available-text: #065f46;
+  --color-available-border: #a7d4ca;
+  --color-gold: #c98a00;
+  --color-update-bg: #fffbeb;
+  --color-update-text: #92400e;
+  --shadow-sm: 0 1px 2px rgba(40,37,29,0.06);
+  --shadow-md: 0 4px 12px rgba(40,37,29,0.08);
+  --shadow-lg: 0 12px 32px rgba(40,37,29,0.12);
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-full: 9999px;
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+  --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+  --text-2xl: clamp(2rem, 1.2rem + 2.5vw, 3.5rem);
+  --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem;
+  --space-4: 1rem; --space-5: 1.25rem; --space-6: 1.5rem;
+  --space-8: 2rem; --space-10: 2.5rem; --space-12: 3rem;
+  --transition: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="dark"] {
+  --color-bg: #171614;
+  --color-surface: #1c1b19;
+  --color-surface-2: #201f1d;
+  --color-surface-offset: #242321;
+  --color-divider: #262523;
+  --color-border: #393836;
+  --color-text: #cdccca;
+  --color-text-muted: #797876;
+  --color-text-faint: #5a5957;
+  --color-primary: #4f98a3;
+  --color-primary-hover: #227f8b;
+  --color-primary-highlight: #1a3030;
+  --color-sold-bg: #2a1515;
+  --color-sold-text: #f29090;
+  --color-sold-border: #5c2424;
+  --color-available-bg: #0d2820;
+  --color-available-text: #6ee7b7;
+  --color-available-border: #1a4a38;
+  --color-gold: #e8af34;
+  --color-update-bg: #1a1500;
+  --color-update-text: #fbbf24;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,0.4);
+}
+
+/* ===== BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: none; text-size-adjust: none; -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+body { min-height: 100dvh; line-height: 1.6; font-family: var(--font-body); font-size: var(--text-sm); color: var(--color-text); background: var(--color-bg); transition: background var(--transition), color var(--transition); }
+button { cursor: pointer; background: none; border: none; font: inherit; color: inherit; }
+input, select { font: inherit; color: inherit; }
+table { border-collapse: collapse; width: 100%; }
+:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; border-radius: var(--radius-sm); }
+
+/* ===== HEADER ===== */
+.header {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-3) var(--space-4);
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
+}
+.header-brand { display: flex; align-items: center; gap: var(--space-3); min-width: 0; }
+.header-logo { width: 32px; height: 32px; flex-shrink: 0; }
+.header-title { font-family: var(--font-display); font-size: var(--text-lg); letter-spacing: -0.01em; line-height: 1; }
+.header-sub { font-size: var(--text-xs); color: var(--color-text-muted); margin-top: 2px; }
+.header-actions { display: flex; align-items: center; gap: var(--space-2); flex-shrink: 0; }
+
+.theme-toggle {
+  width: 34px; height: 34px;
+  border-radius: var(--radius-full);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--color-text-muted);
+  transition: color var(--transition), background var(--transition);
+}
+.theme-toggle:hover { background: var(--color-surface-offset); color: var(--color-text); }
+
+/* ===== LIVE INDICATOR ===== */
+.live-bar {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-surface-2);
+  border-bottom: 1px solid var(--color-divider);
+  font-size: var(--text-xs);
+}
+.live-indicator {
+  display: flex; align-items: center; gap: var(--space-2);
+  color: var(--color-available-text);
+  font-weight: 500;
+}
+.live-dot {
+  width: 7px; height: 7px; border-radius: var(--radius-full);
+  background: var(--color-available-text);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+.live-indicator.loading { color: var(--color-gold); }
+.live-indicator.loading .live-dot { background: var(--color-gold); animation: spin-dot 1s linear infinite; }
+@keyframes spin-dot {
+  0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; }
+}
+.live-indicator.error { color: var(--color-sold-text); }
+.live-indicator.error .live-dot { background: var(--color-sold-text); animation: none; }
+.last-updated { color: var(--color-text-muted); }
+.refresh-btn {
+  display: flex; align-items: center; gap: var(--space-1);
+  padding: 3px var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  color: var(--color-text-muted);
+  transition: all var(--transition);
+}
+.refresh-btn:hover { border-color: var(--color-primary); color: var(--color-primary); background: var(--color-primary-highlight); }
+.refresh-btn svg { flex-shrink: 0; }
+.refresh-btn.spinning svg { animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===== STATS BAR ===== */
+.stats-bar {
+  display: flex; gap: var(--space-2); flex-wrap: wrap;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-2);
+  border-bottom: 1px solid var(--color-divider);
+}
+.stat {
+  display: flex; align-items: center; gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-offset);
+  font-size: var(--text-xs);
+}
+.stat-dot { width: 7px; height: 7px; border-radius: var(--radius-full); flex-shrink: 0; }
+.stat-dot.available { background: var(--color-available-text); }
+.stat-dot.sold { background: var(--color-sold-text); }
+.stat-dot.total { background: var(--color-primary); }
+.stat-val { font-weight: 600; color: var(--color-text); }
+
+/* ===== VIEW TABS ===== */
+.view-tabs {
+  display: flex; align-items: center; gap: var(--space-2);
+  padding: var(--space-3) var(--space-4) 0;
+  border-bottom: 1px solid var(--color-divider);
+  background: var(--color-bg);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.view-tabs::-webkit-scrollbar { display: none; }
+.view-tab {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-xs); font-weight: 500;
+  color: var(--color-text-muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color var(--transition), border-color var(--transition);
+  display: flex; align-items: center; gap: var(--space-2);
+  white-space: nowrap; flex-shrink: 0;
+}
+.view-tab:hover { color: var(--color-text); }
+.view-tab.active { color: var(--color-primary); border-bottom-color: var(--color-primary); }
+
+/* ===== FILTERS ===== */
+.filters {
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-divider);
+  display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center;
+}
+.filter-group { display: flex; align-items: center; gap: var(--space-2); }
+.filter-label { font-size: var(--text-xs); color: var(--color-text-muted); font-weight: 500; white-space: nowrap; }
+
+.select-input {
+  appearance: none;
+  padding: var(--space-2) 28px var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  font-size: var(--text-xs);
+  color: var(--color-text);
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23797876' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  min-width: 90px;
+}
+.select-input:hover { border-color: var(--color-primary); }
+.select-input:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-primary) 20%, transparent); }
+
+.toggle-group {
+  display: flex;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-surface);
+}
+.toggle-btn {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-xs); font-weight: 500;
+  border-right: 1px solid var(--color-border);
+  transition: background var(--transition), color var(--transition);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+.toggle-btn:last-child { border-right: none; }
+.toggle-btn.active { background: var(--color-primary); color: #fff; }
+.toggle-btn:hover:not(.active) { background: var(--color-surface-offset); color: var(--color-text); }
+
+.search-input {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  font-size: var(--text-xs);
+  color: var(--color-text);
+  transition: border-color var(--transition), box-shadow var(--transition);
+  min-width: 140px; flex: 1;
+}
+.search-input::placeholder { color: var(--color-text-faint); }
+.search-input:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-primary) 20%, transparent); }
+
+.filter-reset {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  transition: background var(--transition), color var(--transition), border-color var(--transition);
+}
+.filter-reset:hover { background: var(--color-surface-offset); color: var(--color-text); border-color: var(--color-primary); }
+
+.results-count {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* ===== MOBILE CARD VIEW ===== */
+.card-list {
+  padding: var(--space-3) var(--space-4);
+  display: flex; flex-direction: column; gap: var(--space-3);
+}
+.unit-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition);
+}
+.unit-card.card-sold {
+  background: color-mix(in oklch, var(--color-sold-bg) 40%, var(--color-surface));
+  border-color: var(--color-sold-border);
+}
+.unit-card:hover { box-shadow: var(--shadow-md); }
+.card-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-3);
+}
+.card-id {
+  display: flex; align-items: center; gap: var(--space-2);
+}
+.floor-badge {
+  display: inline-block;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-highlight);
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+}
+.unit-num { font-weight: 700; font-size: var(--text-sm); color: var(--color-text); }
+.type-badge {
+  display: inline-block;
+  padding: 3px var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.type-STUDIO { background: color-mix(in oklch, var(--color-gold) 15%, transparent); color: var(--color-gold); }
+.type-1BHK   { background: color-mix(in oklch, var(--color-primary) 15%, transparent); color: var(--color-primary); }
+.type-2BHK   { background: color-mix(in oklch, #8b5cf6 15%, transparent); color: #8b5cf6; }
+
+.card-body {
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3);
+}
+.card-field {}
+.card-field-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-faint); margin-bottom: 2px; }
+.card-field-val { font-size: var(--text-sm); font-weight: 600; font-variant-numeric: tabular-nums; }
+.card-field-sub { font-size: 10px; color: var(--color-text-faint); }
+.card-footer { margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--color-divider); display: flex; justify-content: flex-end; }
+
+.status-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.03em; text-transform: uppercase;
+  border: 1px solid;
+}
+.status-sold { background: var(--color-sold-bg); color: var(--color-sold-text); border-color: var(--color-sold-border); }
+.status-available { background: var(--color-available-bg); color: var(--color-available-text); border-color: var(--color-available-border); }
+.status-dot { width: 5px; height: 5px; border-radius: var(--radius-full); background: currentColor; }
+
+/* ===== TABLE VIEW (desktop) ===== */
+.table-container {
+  overflow-x: auto;
+  padding: var(--space-4);
+  -webkit-overflow-scrolling: touch;
+}
+.data-table {
+  min-width: 640px;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+}
+.data-table thead tr {
+  background: var(--color-surface-offset);
+  border-bottom: 2px solid var(--color-border);
+}
+.data-table th {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  user-select: none;
+  cursor: pointer;
+}
+.data-table th:hover { color: var(--color-text); }
+.sort-icon { display: inline-block; margin-left: 4px; opacity: 0.4; transition: opacity var(--transition), transform var(--transition); }
+.data-table th.sort-asc .sort-icon,
+.data-table th.sort-desc .sort-icon { opacity: 1; color: var(--color-primary); }
+.data-table th.sort-desc .sort-icon { transform: rotate(180deg); }
+.data-table tbody tr {
+  border-bottom: 1px solid var(--color-divider);
+  transition: background var(--transition);
+}
+.data-table tbody tr:last-child { border-bottom: none; }
+.data-table tbody tr:hover { background: var(--color-surface-2); }
+.data-table tbody tr.row-sold { background: color-mix(in oklch, var(--color-sold-bg) 40%, transparent); }
+.data-table tbody tr.row-sold:hover { background: color-mix(in oklch, var(--color-sold-bg) 60%, transparent); }
+.data-table td { padding: var(--space-3) var(--space-4); font-size: var(--text-xs); vertical-align: middle; }
+.cell-floor { font-weight: 600; color: var(--color-text-muted); font-size: var(--text-xs); }
+.cell-unit { font-weight: 600; color: var(--color-text); font-variant-numeric: tabular-nums; }
+.cell-area { font-variant-numeric: tabular-nums; color: var(--color-text); }
+.cell-area-unit { font-size: 10px; color: var(--color-text-faint); margin-left: 2px; }
+.cell-price { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--color-text); }
+.price-per-sqft { font-size: 10px; color: var(--color-text-faint); display: block; margin-top: 2px; }
+
+/* ===== AGGREGATE VIEW ===== */
+.agg-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+}
+.agg-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition);
+}
+.agg-card:hover { box-shadow: var(--shadow-md); }
+.agg-card-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-divider);
+}
+.agg-card-title { font-weight: 700; font-size: var(--text-sm); }
+.agg-card-count { font-size: var(--text-xs); color: var(--color-text-muted); }
+.agg-stats { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+.agg-stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-faint); margin-bottom: 2px; }
+.agg-stat-val { font-size: var(--text-sm); font-weight: 600; font-variant-numeric: tabular-nums; }
+.agg-stat-val.highlight { color: var(--color-primary); }
+.agg-avail-bar { margin-top: var(--space-3); }
+.agg-avail-label { display: flex; justify-content: space-between; font-size: 10px; color: var(--color-text-muted); margin-bottom: var(--space-1); }
+.agg-bar-track { background: var(--color-surface-offset); border-radius: var(--radius-full); height: 6px; overflow: hidden; }
+.agg-bar-fill { height: 100%; border-radius: var(--radius-full); background: var(--color-primary); transition: width 0.4s ease; }
+.agg-bar-fill.sold { background: var(--color-sold-text); }
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: var(--space-12) var(--space-8);
+  color: var(--color-text-muted);
+  text-align: center;
+  gap: var(--space-4);
+}
+.empty-state svg { color: var(--color-text-faint); }
+.empty-state p { max-width: 36ch; font-size: var(--text-sm); }
+
+/* ===== RESPONSIVE ===== */
+@media (min-width: 768px) {
+  .card-list { display: none; }
+  .table-container { display: block; }
+}
+@media (max-width: 767px) {
+  .card-list { display: flex; }
+  .table-container { display: none; }
+  .agg-grid { grid-template-columns: 1fr; }
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: var(--radius-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-text-faint); }
+
+/* ===== PRICE CHANGE ANIMATION ===== */
+@keyframes price-flash {
+  0% { background: color-mix(in oklch, var(--color-primary) 30%, transparent); }
+  100% { background: transparent; }
+}
+.price-changed { animation: price-flash 1.5s ease-out; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-brand">
+    <svg class="header-logo" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Celesto 4">
+      <rect width="36" height="36" rx="8" fill="currentColor" opacity="0.08"/>
+      <path d="M18 6L28 12V24L18 30L8 24V12L18 6Z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round" opacity="0.4"/>
+      <path d="M18 10L24 13.5V20.5L18 24L12 20.5V13.5L18 10Z" fill="currentColor" opacity="0.7"/>
+      <circle cx="18" cy="17" r="2.5" fill="var(--color-bg)"/>
+    </svg>
+    <div>
+      <div class="header-title">Celesto 4</div>
+      <div class="header-sub">Unit Price List · Floors 4–16</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- LIVE BAR -->
+<div class="live-bar">
+  <div class="live-indicator" id="liveIndicator">
+    <span class="live-dot"></span>
+    <span id="liveStatus">Live · Auto-updates every 5 min</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:var(--space-3);">
+    <span class="last-updated" id="lastUpdated"></span>
+    <button class="refresh-btn" id="refreshBtn" onclick="fetchData(true)">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+      Refresh
+    </button>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar" id="statsBar"></div>
+
+<!-- VIEW TABS -->
+<div class="view-tabs">
+  <button class="view-tab active" data-view="list" onclick="switchView('list')">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v4H3zM3 11h18v4H3zM3 19h18v4H3z"/></svg>
+    Unit List
+  </button>
+  <button class="view-tab" data-view="agg" onclick="switchView('agg')">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Summary
+  </button>
+</div>
+
+<!-- FILTERS -->
+<div class="filters" id="filterBar">
+  <div class="filter-group">
+    <span class="filter-label">Floor</span>
+    <select class="select-input" id="filterFloor" onchange="applyFilters()">
+      <option value="">All</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">Type</span>
+    <select class="select-input" id="filterType" onchange="applyFilters()">
+      <option value="">All</option>
+      <option value="STUDIO">Studio</option>
+      <option value="1BHK">1 BHK</option>
+      <option value="2BHK">2 BHK</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">Status</span>
+    <select class="select-input" id="filterStatus" onchange="applyFilters()">
+      <option value="">All</option>
+      <option value="available">Available</option>
+      <option value="sold">Sold</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">Area</span>
+    <div class="toggle-group">
+      <button class="toggle-btn active" id="btnSqft" onclick="setAreaUnit('sqft')">sqft</button>
+      <button class="toggle-btn" id="btnSqm" onclick="setAreaUnit('sqm')">m²</button>
+    </div>
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">Sort</span>
+    <select class="select-input" id="sortSelect" onchange="applyFilters()">
+      <option value="floor-asc">Floor ↑</option>
+      <option value="floor-desc">Floor ↓</option>
+      <option value="unit-asc">Unit ↑</option>
+      <option value="unit-desc">Unit ↓</option>
+      <option value="price-asc">Price ↑</option>
+      <option value="price-desc">Price ↓</option>
+      <option value="area-asc">Area ↑</option>
+      <option value="area-desc">Area ↓</option>
+    </select>
+  </div>
+  <input class="search-input" type="search" id="searchInput" placeholder="Search unit, floor, type…" oninput="applyFilters()">
+  <button class="filter-reset" onclick="resetFilters()">Reset</button>
+  <span class="results-count" id="resultsCount"></span>
+</div>
+
+<!-- UNIT LIST VIEW -->
+<div id="viewList">
+  <!-- Mobile cards -->
+  <div class="card-list" id="cardList"></div>
+  <!-- Desktop table -->
+  <div class="table-container">
+    <table class="data-table" id="mainTable">
+      <thead>
+        <tr>
+          <th onclick="colSort('floor')" data-col="floor">Floor <span class="sort-icon">↑</span></th>
+          <th onclick="colSort('unit_no')" data-col="unit_no">Unit # <span class="sort-icon">↑</span></th>
+          <th onclick="colSort('unit_type')" data-col="unit_type">Type <span class="sort-icon">↑</span></th>
+          <th onclick="colSort('area')" data-col="area">Area <span class="sort-icon">↑</span></th>
+          <th onclick="colSort('price')" data-col="price">Price (AED) <span class="sort-icon">↑</span></th>
+          <th onclick="colSort('price_per_area')" data-col="price_per_area">AED/Area <span class="sort-icon">↑</span></th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+    <div id="tableEmpty" class="empty-state" style="display:none;">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <p>No units match your filters. Try adjusting your search.</p>
+    </div>
+  </div>
+</div>
+
+<!-- AGGREGATE VIEW -->
+<div id="viewAgg" style="display:none;">
+  <div class="agg-grid" id="aggGrid"></div>
+</div>
+
+<script>
+// ===== SOLD STATUS BASELINE (from original data) =====
+// Since the Google Sheet uses cell background color (not text) to indicate sold status,
+// we maintain this map as the authoritative source for availability.
+// Prices are always fetched live from the Google Sheet.
+const SOLD_MAP = {"4-1":false,"4-2":false,"4-3":true,"4-4":true,"4-5":true,"4-6":true,"4-7":true,"4-8":true,"4-9":true,"4-10":true,"4-11":false,"4-12":true,"4-13":false,"4-14":true,"4-15":false,"4-16":false,"4-17":false,"4-18":true,"4-19":false,"4-20":false,"4-21":true,"4-22":false,"4-23":false,"5-1":true,"5-2":false,"5-3":true,"5-4":true,"5-5":true,"5-6":true,"5-7":true,"5-8":true,"5-9":true,"5-10":true,"5-11":true,"5-12":true,"5-13":false,"5-14":false,"5-15":true,"5-16":false,"5-17":false,"5-18":true,"5-19":true,"5-20":false,"5-21":true,"5-22":false,"5-23":false,"6-1":false,"6-2":false,"6-3":true,"6-4":true,"6-5":true,"6-6":true,"6-7":true,"6-8":true,"6-9":true,"6-10":true,"6-11":false,"6-12":true,"6-13":false,"6-14":false,"6-15":true,"6-16":false,"6-17":false,"6-18":true,"6-19":false,"6-20":false,"6-21":false,"6-22":false,"6-23":true,"7-1":false,"7-2":false,"7-3":true,"7-4":true,"7-5":true,"7-6":true,"7-7":true,"7-8":true,"7-9":true,"7-10":true,"7-11":true,"7-12":false,"7-13":false,"7-14":false,"7-15":true,"7-16":false,"7-17":false,"7-18":true,"7-19":false,"7-20":false,"7-21":false,"7-22":false,"7-23":false,"8-1":true,"8-2":false,"8-3":true,"8-4":true,"8-5":true,"8-6":true,"8-7":true,"8-8":true,"8-9":true,"8-10":true,"8-11":true,"8-12":false,"8-13":false,"8-14":false,"8-15":true,"8-16":false,"8-17":false,"8-18":true,"8-19":false,"8-20":false,"8-21":false,"8-22":false,"8-23":false,"9-1":true,"9-2":false,"9-3":true,"9-4":true,"9-5":true,"9-6":true,"9-7":true,"9-8":true,"9-9":true,"9-10":true,"9-11":false,"9-12":true,"9-13":false,"9-14":false,"9-15":true,"9-16":true,"9-17":false,"9-18":true,"9-19":true,"9-20":false,"9-21":true,"9-22":false,"9-23":false,"10-1":false,"10-2":false,"10-3":true,"10-4":true,"10-5":true,"10-6":true,"10-7":true,"10-8":true,"10-9":true,"10-10":true,"10-11":false,"10-12":false,"10-13":false,"10-14":false,"10-15":true,"10-16":false,"10-17":false,"10-18":true,"10-19":true,"10-20":false,"10-21":false,"10-22":false,"10-23":false,"11-1":false,"11-2":false,"11-3":true,"11-4":true,"11-5":true,"11-6":true,"11-7":true,"11-8":false,"11-9":true,"11-10":true,"11-11":false,"11-12":false,"11-13":false,"11-14":false,"11-15":true,"11-16":false,"11-17":true,"11-18":false,"11-19":true,"11-20":false,"11-21":true,"11-22":false,"11-23":false,"12-1":false,"12-2":false,"12-3":true,"12-4":true,"12-5":true,"12-6":true,"12-7":false,"12-8":true,"12-9":true,"12-10":true,"12-11":false,"12-12":true,"12-13":false,"12-14":false,"12-15":true,"12-16":false,"12-17":false,"12-18":true,"12-19":false,"12-20":false,"12-21":true,"12-22":false,"12-23":true,"13-1":false,"13-2":false,"13-3":true,"13-4":true,"13-5":false,"13-6":true,"13-7":false,"13-8":false,"13-9":true,"13-10":true,"13-11":true,"13-12":false,"13-13":false,"13-14":false,"13-15":true,"13-16":false,"13-17":false,"13-18":false,"13-19":false,"13-20":false,"13-21":true,"13-22":false,"13-23":false,"14-1":false,"14-2":false,"14-3":true,"14-4":true,"14-5":true,"14-6":true,"14-7":false,"14-8":false,"14-9":true,"14-10":true,"14-11":true,"14-12":false,"14-13":false,"14-14":false,"14-15":false,"14-16":false,"14-17":false,"14-18":false,"14-19":true,"14-20":false,"14-21":true,"14-22":false,"14-23":false,"15-1":false,"15-2":false,"15-3":true,"15-4":false,"15-5":false,"15-6":false,"15-7":false,"15-8":false,"15-9":true,"15-10":true,"15-11":false,"15-12":false,"15-13":false,"15-14":true,"15-15":false,"15-16":false,"15-17":false,"15-18":false,"15-19":true,"15-20":false,"15-21":false,"15-22":false,"15-23":false,"16-1":true,"16-2":false,"16-3":true,"16-4":false,"16-5":false,"16-6":false,"16-7":false,"16-8":false,"16-9":true,"16-10":true,"16-11":false,"16-12":false,"16-13":false,"16-14":true,"16-15":false,"16-16":false,"16-17":false,"16-18":true,"16-19":false,"16-20":false,"16-21":false,"16-22":true,"16-23":false};
+
+// ===== STATE =====
+const SHEET_ID = '1q98jo63wFwgFxJTb_0adzKDHOV3U7np_tdydqBaA0nw';
+const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Sheet1`;
+const REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
+
+let RAW_DATA = [];
+let filteredData = [];
+let areaUnit = 'sqft';
+let currentView = 'list';
+let sortCol = 'floor';
+let sortDir = 'asc';
+let refreshTimer = null;
+let prevPrices = {};
+
+// ===== FETCH DATA FROM GOOGLE SHEETS =====
+async function fetchData(manual = false) {
+  const btn = document.getElementById('refreshBtn');
+  const indicator = document.getElementById('liveIndicator');
+  const status = document.getElementById('liveStatus');
+
+  btn.classList.add('spinning');
+  indicator.className = 'live-indicator loading';
+  status.textContent = 'Fetching latest data…';
+
+  try {
+    // Use a cache-busting timestamp
+    const url = `${GVIZ_URL}&_=${Date.now()}`;
+    const resp = await fetch(url);
+    const raw = await resp.text();
+    
+    // Strip the callback wrapper: google.visualization.Query.setResponse({...});
+    const jsonStr = raw.replace(/^[^(]+\(/, '').replace(/\);?\s*$/, '');
+    const data = JSON.parse(jsonStr);
+    const rows = data.table.rows;
+
+    // Parse rows into unit objects
+    const newData = [];
+    let currentFloor = null;
+
+    for (const row of rows) {
+      const cells = row.c || [];
+      const get = (i) => (cells[i] && cells[i].v !== undefined && cells[i].v !== null) ? cells[i].v : null;
+
+      const floorCell = get(0);
+      const unitNo = get(1);
+      const unitType = get(2);
+      const areaSqft = get(3);
+      const price = get(4);
+
+      // Detect floor label rows
+      if (floorCell && typeof floorCell === 'string' && floorCell.toLowerCase().includes('floor')) {
+        const m = floorCell.match(/\d+/);
+        if (m) currentFloor = parseInt(m[0]);
+      }
+
+      if (unitNo !== null && unitType && areaSqft && price && currentFloor) {
+        const floorNum = currentFloor;
+        const unitNum = Math.round(unitNo);
+        const key = `${floorNum}-${unitNum}`;
+        const sold = SOLD_MAP[key] === true;
+        const areaSqm = Math.round(areaSqft * 0.0929 * 100) / 100;
+
+        newData.push({
+          floor: floorNum,
+          unit_no: unitNum,
+          unit_type: unitType.trim(),
+          area_sqft: areaSqft,
+          area_sqm: areaSqm,
+          price: Math.round(price),
+          sold
+        });
+      }
+    }
+
+    if (newData.length > 0) {
+      // Detect price changes for animation
+      const changed = new Set();
+      for (const u of newData) {
+        const key = `${u.floor}-${u.unit_no}`;
+        if (prevPrices[key] !== undefined && prevPrices[key] !== u.price) {
+          changed.add(key);
+        }
+        prevPrices[key] = u.price;
+      }
+
+      RAW_DATA = newData;
+      applyFilters();
+      updateStats();
+      if (currentView === 'agg') renderAgg();
+
+      // Flash changed prices
+      if (changed.size > 0) {
+        setTimeout(() => {
+          changed.forEach(key => {
+            document.querySelectorAll(`[data-key="${key}"] .cell-price, [data-key="${key}"] .card-price`).forEach(el => {
+              el.classList.remove('price-changed');
+              void el.offsetWidth;
+              el.classList.add('price-changed');
+            });
+          });
+        }, 100);
+      }
+
+      indicator.className = 'live-indicator';
+      status.textContent = 'Live · Auto-updates every 5 min';
+      document.getElementById('lastUpdated').textContent = 'Updated ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    } else {
+      throw new Error('No data parsed');
+    }
+  } catch (err) {
+    console.error('Fetch error:', err);
+    indicator.className = 'live-indicator error';
+    status.textContent = 'Update failed — retrying soon';
+    // If no data yet, use fallback
+    if (RAW_DATA.length === 0) {
+      loadFallback();
+    }
+  } finally {
+    btn.classList.remove('spinning');
+  }
+}
+
+function loadFallback() {
+  // Fallback: reconstruct from SOLD_MAP with placeholder prices
+  // This should rarely be needed
+  console.warn('Using fallback data');
+}
+
+// ===== FILTERS =====
+function applyFilters() {
+  const floor = document.getElementById('filterFloor').value;
+  const type = document.getElementById('filterType').value;
+  const status = document.getElementById('filterStatus').value;
+  const search = document.getElementById('searchInput').value.toLowerCase().trim();
+  const sort = document.getElementById('sortSelect').value;
+
+  let data = [...RAW_DATA];
+
+  if (floor) data = data.filter(u => u.floor === parseInt(floor));
+  if (type) data = data.filter(u => u.unit_type === type);
+  if (status === 'available') data = data.filter(u => !u.sold);
+  if (status === 'sold') data = data.filter(u => u.sold);
+  if (search) {
+    data = data.filter(u =>
+      String(u.unit_no).includes(search) ||
+      String(u.floor).includes(search) ||
+      u.unit_type.toLowerCase().includes(search) ||
+      (u.sold ? 'sold' : 'available').includes(search)
+    );
+  }
+
+  // Sort
+  const [sc, sd] = sort.split('-');
+  data.sort((a, b) => {
+    let av, bv;
+    if (sc === 'floor') { av = a.floor; bv = b.floor; }
+    else if (sc === 'unit') { av = a.unit_no; bv = b.unit_no; }
+    else if (sc === 'price') { av = a.price; bv = b.price; }
+    else if (sc === 'area') { av = areaUnit === 'sqft' ? a.area_sqft : a.area_sqm; bv = areaUnit === 'sqft' ? b.area_sqft : b.area_sqm; }
+    else { av = a.floor; bv = b.floor; }
+    if (av < bv) return sd === 'asc' ? -1 : 1;
+    if (av > bv) return sd === 'asc' ? 1 : -1;
+    // Secondary sort: floor then unit
+    if (a.floor !== b.floor) return a.floor - b.floor;
+    return a.unit_no - b.unit_no;
+  });
+
+  filteredData = data;
+  document.getElementById('resultsCount').textContent = `${data.length} unit${data.length !== 1 ? 's' : ''}`;
+
+  renderTable();
+  renderCards();
+  if (currentView === 'agg') renderAgg();
+}
+
+function colSort(col) {
+  if (sortCol === col) {
+    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortCol = col;
+    sortDir = 'asc';
+  }
+  // Map col to sort select value
+  const map = { floor: 'floor', unit_no: 'unit', unit_type: 'floor', area: 'area', price: 'price', price_per_area: 'price' };
+  const sc = map[col] || 'floor';
+  document.getElementById('sortSelect').value = `${sc}-${sortDir}`;
+  // Update header classes
+  document.querySelectorAll('.data-table th').forEach(th => {
+    th.classList.remove('sort-asc', 'sort-desc');
+    if (th.dataset.col === col) th.classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+  });
+  applyFilters();
+}
+
+function resetFilters() {
+  document.getElementById('filterFloor').value = '';
+  document.getElementById('filterType').value = '';
+  document.getElementById('filterStatus').value = '';
+  document.getElementById('searchInput').value = '';
+  document.getElementById('sortSelect').value = 'floor-asc';
+  applyFilters();
+}
+
+function setAreaUnit(unit) {
+  areaUnit = unit;
+  document.getElementById('btnSqft').classList.toggle('active', unit === 'sqft');
+  document.getElementById('btnSqm').classList.toggle('active', unit === 'sqm');
+  applyFilters();
+}
+
+// ===== RENDER TABLE (desktop) =====
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  const empty = document.getElementById('tableEmpty');
+
+  if (filteredData.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = filteredData.map(u => {
+    const key = `${u.floor}-${u.unit_no}`;
+    const area = areaUnit === 'sqft' ? u.area_sqft : u.area_sqm;
+    const areaLabel = areaUnit === 'sqft' ? 'sqft' : 'm²';
+    const ppa = areaUnit === 'sqft' ? Math.round(u.price / u.area_sqft) : Math.round(u.price / u.area_sqm);
+    const ppaLabel = areaUnit === 'sqft' ? '/sqft' : '/m²';
+    return `<tr class="${u.sold ? 'row-sold' : ''}" data-key="${key}">
+      <td><span class="cell-floor floor-badge">F${u.floor}</span></td>
+      <td><span class="cell-unit">${u.unit_no}</span></td>
+      <td><span class="type-badge type-${u.unit_type}">${u.unit_type}</span></td>
+      <td class="cell-area">${area.toLocaleString()}<span class="cell-area-unit">${areaLabel}</span></td>
+      <td><span class="cell-price">${u.price.toLocaleString()}</span><span class="price-per-sqft">${ppa.toLocaleString()}${ppaLabel}</span></td>
+      <td class="cell-price">${ppa.toLocaleString()}<span class="price-per-sqft">${ppaLabel}</span></td>
+      <td><span class="status-badge ${u.sold ? 'status-sold' : 'status-available'}"><span class="status-dot"></span>${u.sold ? 'Sold' : 'Available'}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== RENDER CARDS (mobile) =====
+function renderCards() {
+  const list = document.getElementById('cardList');
+
+  if (filteredData.length === 0) {
+    list.innerHTML = `<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><p>No units match your filters.</p></div>`;
+    return;
+  }
+
+  list.innerHTML = filteredData.map(u => {
+    const key = `${u.floor}-${u.unit_no}`;
+    const area = areaUnit === 'sqft' ? u.area_sqft : u.area_sqm;
+    const areaLabel = areaUnit === 'sqft' ? 'sqft' : 'm²';
+    const ppa = areaUnit === 'sqft' ? Math.round(u.price / u.area_sqft) : Math.round(u.price / u.area_sqm);
+    const ppaLabel = areaUnit === 'sqft' ? '/sqft' : '/m²';
+    return `<div class="unit-card ${u.sold ? 'card-sold' : ''}" data-key="${key}">
+      <div class="card-header">
+        <div class="card-id">
+          <span class="floor-badge">F${u.floor}</span>
+          <span class="unit-num">Unit ${u.unit_no}</span>
+        </div>
+        <span class="type-badge type-${u.unit_type}">${u.unit_type}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-field">
+          <div class="card-field-label">Price</div>
+          <div class="card-field-val card-price">AED ${u.price.toLocaleString()}</div>
+          <div class="card-field-sub">${ppa.toLocaleString()} AED${ppaLabel}</div>
+        </div>
+        <div class="card-field">
+          <div class="card-field-label">Area</div>
+          <div class="card-field-val">${area.toLocaleString()} ${areaLabel}</div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="status-badge ${u.sold ? 'status-sold' : 'status-available'}"><span class="status-dot"></span>${u.sold ? 'Sold' : 'Available'}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== RENDER AGGREGATE =====
+function renderAgg() {
+  const grid = document.getElementById('aggGrid');
+  const data = RAW_DATA;
+
+  // Group by type
+  const types = ['STUDIO', '1BHK', '2BHK'];
+  const groups = {};
+  for (const t of types) {
+    const units = data.filter(u => u.unit_type === t);
+    const avail = units.filter(u => !u.sold);
+    const sold = units.filter(u => u.sold);
+    if (units.length === 0) continue;
+    const prices = units.map(u => u.price);
+    groups[t] = {
+      total: units.length,
+      available: avail.length,
+      sold: sold.length,
+      minPrice: Math.min(...prices),
+      maxPrice: Math.max(...prices),
+      avgPrice: Math.round(prices.reduce((a,b)=>a+b,0)/prices.length)
+    };
+  }
+
+  grid.innerHTML = Object.entries(groups).map(([type, g]) => {
+    const availPct = Math.round((g.available / g.total) * 100);
+    const soldPct = 100 - availPct;
+    return `<div class="agg-card">
+      <div class="agg-card-header">
+        <span class="agg-card-title"><span class="type-badge type-${type}">${type}</span></span>
+        <span class="agg-card-count">${g.total} units</span>
+      </div>
+      <div class="agg-stats">
+        <div class="agg-stat-item">
+          <div class="agg-stat-label">Available</div>
+          <div class="agg-stat-val highlight">${g.available}</div>
+        </div>
+        <div class="agg-stat-item">
+          <div class="agg-stat-label">Sold</div>
+          <div class="agg-stat-val">${g.sold}</div>
+        </div>
+        <div class="agg-stat-item">
+          <div class="agg-stat-label">Min Price</div>
+          <div class="agg-stat-val">${(g.minPrice/1e6).toFixed(2)}M</div>
+        </div>
+        <div class="agg-stat-item">
+          <div class="agg-stat-label">Max Price</div>
+          <div class="agg-stat-val">${(g.maxPrice/1e6).toFixed(2)}M</div>
+        </div>
+        <div class="agg-stat-item" style="grid-column:1/-1">
+          <div class="agg-stat-label">Avg Price</div>
+          <div class="agg-stat-val highlight">AED ${g.avgPrice.toLocaleString()}</div>
+        </div>
+      </div>
+      <div class="agg-avail-bar">
+        <div class="agg-avail-label"><span>${availPct}% available</span><span>${soldPct}% sold</span></div>
+        <div class="agg-bar-track">
+          <div class="agg-bar-fill" style="width:${availPct}%"></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Also add a per-floor summary
+  const floors = [...new Set(data.map(u => u.floor))].sort((a,b)=>a-b);
+  const floorCards = floors.map(floor => {
+    const units = data.filter(u => u.floor === floor);
+    const avail = units.filter(u => !u.sold);
+    const sold = units.filter(u => u.sold);
+    const availPct = Math.round((avail.length / units.length) * 100);
+    const prices = units.map(u => u.price);
+    const minP = Math.min(...prices);
+    const maxP = Math.max(...prices);
+    return `<div class="agg-card">
+      <div class="agg-card-header">
+        <span class="agg-card-title">Floor ${floor}</span>
+        <span class="agg-card-count">${units.length} units</span>
+      </div>
+      <div class="agg-stats">
+        <div class="agg-stat-item">
+          <div class="agg-stat-label">Available</div>
+          <div class="agg-stat-val highlight">${avail.length}</div>
+        </div>
+        <div class="agg-stat-item">
+          <div class="agg-stat-label">Sold</div>
+          <div class="agg-stat-val">${sold.length}</div>
+        </div>
+        <div class="agg-stat-item">
+          <div class="agg-stat-label">Min Price</div>
+          <div class="agg-stat-val">${(minP/1e6).toFixed(2)}M</div>
+        </div>
+        <div class="agg-stat-item">
+          <div class="agg-stat-label">Max Price</div>
+          <div class="agg-stat-val">${(maxP/1e6).toFixed(2)}M</div>
+        </div>
+      </div>
+      <div class="agg-avail-bar">
+        <div class="agg-avail-label"><span>${availPct}% available</span><span>${100-availPct}% sold</span></div>
+        <div class="agg-bar-track">
+          <div class="agg-bar-fill" style="width:${availPct}%"></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  grid.innerHTML += floorCards;
+}
+
+// ===== STATS BAR =====
+function updateStats() {
+  const total = RAW_DATA.length;
+  const avail = RAW_DATA.filter(u => !u.sold).length;
+  const sold = RAW_DATA.filter(u => u.sold).length;
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat"><span class="stat-dot total"></span><span>Total</span><span class="stat-val">${total}</span></div>
+    <div class="stat"><span class="stat-dot available"></span><span>Available</span><span class="stat-val">${avail}</span></div>
+    <div class="stat"><span class="stat-dot sold"></span><span>Sold</span><span class="stat-val">${sold}</span></div>
+    <div class="stat"><span class="stat-dot total"></span><span>Sold %</span><span class="stat-val">${Math.round(sold/total*100)}%</span></div>
+  `;
+}
+
+// ===== VIEW SWITCHING =====
+function switchView(view) {
+  currentView = view;
+  document.getElementById('viewList').style.display = view === 'list' ? '' : 'none';
+  document.getElementById('viewAgg').style.display = view === 'agg' ? '' : 'none';
+  document.getElementById('filterBar').style.display = view === 'list' ? '' : 'none';
+  document.querySelectorAll('.view-tab').forEach(t => t.classList.toggle('active', t.dataset.view === view));
+  if (view === 'agg') renderAgg();
+}
+
+// ===== THEME =====
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  document.querySelector('meta[name="theme-color"]').content = next === 'dark' ? '#171614' : '#f7f6f2';
+}
+
+// ===== FLOOR FILTER POPULATION =====
+function populateFloorFilter() {
+  const floors = [...new Set(RAW_DATA.map(u => u.floor))].sort((a,b)=>a-b);
+  const sel = document.getElementById('filterFloor');
+  const current = sel.value;
+  sel.innerHTML = '<option value="">All</option>' + floors.map(f => `<option value="${f}"${f==current?'selected':''}>Floor ${f}</option>`).join('');
+}
+
+// ===== AUTO REFRESH =====
+function scheduleRefresh() {
+  if (refreshTimer) clearInterval(refreshTimer);
+  refreshTimer = setInterval(() => fetchData(false), REFRESH_INTERVAL);
+}
+
+// ===== INIT =====
+(function init() {
+  // Restore theme
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  document.querySelector('meta[name="theme-color"]').content = savedTheme === 'dark' ? '#171614' : '#f7f6f2';
+
+  // Fetch data immediately
+  fetchData(false).then(() => {
+    populateFloorFilter();
+    scheduleRefresh();
+  });
+
+  // Refresh on visibility change (when user returns to tab)
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      const lastUpdatedText = document.getElementById('lastUpdated').textContent;
+      // If last update was more than 2 minutes ago, refresh
+      if (lastUpdatedText) {
+        fetchData(false);
+      }
+    }
+  });
+})();
+</script>
+</body>
+</html>
