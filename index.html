@@ -477,6 +477,83 @@ table { border-collapse: collapse; width: 100%; }
 }
 .floor-type-dot.avail { background: var(--color-available-text); }
 .floor-type-dot.sold  { background: var(--color-sold-text); }
+
+/* ===== FLOOR DRILL-DOWN ===== */
+.floor-drill-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: var(--space-3);
+  padding: 7px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.floor-drill-btn:hover {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+.floor-drill-btn svg { transition: transform var(--transition); }
+.floor-drill-btn.open svg { transform: rotate(180deg); }
+.floor-drill-panel {
+  display: none;
+  margin-top: var(--space-3);
+  border-top: 1px solid var(--color-divider);
+  padding-top: var(--space-3);
+}
+.floor-drill-panel.open { display: block; }
+.floor-drill-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+.floor-drill-table th {
+  text-align: left;
+  padding: 4px 6px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-faint);
+  border-bottom: 1px solid var(--color-divider);
+  white-space: nowrap;
+}
+.floor-drill-table td {
+  padding: 6px 6px;
+  border-bottom: 1px solid var(--color-divider);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.floor-drill-table tr:last-child td { border-bottom: none; }
+.floor-drill-table tr.sold-row td { opacity: 0.75; }
+.drill-status-avail {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-available-text);
+  font-weight: 600;
+}
+.drill-status-sold {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-sold-text);
+  font-weight: 600;
+}
+.drill-sold-date {
+  color: var(--color-text-faint);
+  font-size: 10px;
+  white-space: nowrap;
+}
 .agg-avail-bar { margin-top: var(--space-3); }
 .agg-avail-label { display: flex; justify-content: space-between; font-size: 10px; color: var(--color-text-muted); margin-bottom: var(--space-1); }
 .agg-bar-track { background: var(--color-surface-offset); border-radius: var(--radius-full); height: 6px; overflow: hidden; }
@@ -1107,9 +1184,13 @@ function renderCards() {
 }
 
 // ===== RENDER AGGREGATE =====
-function renderAgg() {
+async function renderAgg() {
   const grid = document.getElementById('aggGrid');
   const data = RAW_DATA;
+  // Ensure sales history is loaded before rendering sold dates
+  if (!salesHistory) {
+    salesHistory = await loadSalesHistory();
+  }
 
   // Group by type
   const types = ['STUDIO', '1BHK', '2BHK'];
@@ -1196,6 +1277,31 @@ function renderAgg() {
       </div>`;
     }).join('');
 
+    // Build drill-down unit rows (sorted: available first, then sold)
+    const sortedUnits = [...avail, ...sold].sort((a,b) => a.unit_no - b.unit_no);
+    const drillRows = sortedUnits.map(u => {
+      const soldDate = getSoldDate(floor, u.unit_no);
+      const price = u.price ? `AED ${(u.price/1e6).toFixed(3)}M` : '—';
+      const typeColor = typeColors[u.unit_type] || 'var(--color-text-muted)';
+      if (u.sold) {
+        return `<tr class="sold-row">
+          <td><span style="font-weight:700;color:var(--color-text)">${u.unit_no}</span></td>
+          <td><span style="font-size:10px;font-weight:700;color:${typeColor};background:${typeColor}22;border:1px solid ${typeColor}44;padding:1px 6px;border-radius:999px">${u.unit_type}</span></td>
+          <td style="color:var(--color-text-muted)">${price}</td>
+          <td><span class="drill-status-sold"><span class="floor-type-dot sold"></span>Sold</span></td>
+          <td class="drill-sold-date">${soldDate}</td>
+        </tr>`;
+      } else {
+        return `<tr>
+          <td><span style="font-weight:700;color:var(--color-text)">${u.unit_no}</span></td>
+          <td><span style="font-size:10px;font-weight:700;color:${typeColor};background:${typeColor}22;border:1px solid ${typeColor}44;padding:1px 6px;border-radius:999px">${u.unit_type}</span></td>
+          <td style="color:var(--color-text-muted)">${price}</td>
+          <td><span class="drill-status-avail"><span class="floor-type-dot avail"></span>Avail</span></td>
+          <td class="drill-sold-date">—</td>
+        </tr>`;
+      }
+    }).join('');
+
     return `<div class="agg-card">
       <div class="agg-card-header">
         <span class="agg-card-title">Floor ${floor}</span>
@@ -1226,6 +1332,18 @@ function renderAgg() {
           <div class="agg-bar-fill" style="width:${availPct}%"></div>
         </div>
       </div>
+      <button class="floor-drill-btn" onclick="toggleFloorDrill(this)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        View all units
+      </button>
+      <div class="floor-drill-panel">
+        <table class="floor-drill-table">
+          <thead><tr>
+            <th>Unit</th><th>Type</th><th>Price</th><th>Status</th><th>Sold Date</th>
+          </tr></thead>
+          <tbody>${drillRows}</tbody>
+        </table>
+      </div>
     </div>`;
   }).join('');
 
@@ -1236,6 +1354,34 @@ function renderAgg() {
     renderDemandCharts(data);
     renderDailySalesChart();
   }, 0);
+}
+
+// ===== FLOOR DRILL-DOWN HELPERS =====
+function getSoldDate(floor, unitNo) {
+  if (!salesHistory || !salesHistory.daily) return '—';
+  const key = `${floor}-${unitNo}`;
+  // Search all days for this unit's sold event
+  for (const [date, dayData] of Object.entries(salesHistory.daily).sort().reverse()) {
+    const soldEvents = dayData.sold || [];
+    const found = soldEvents.find(e => e.key === key || (e.floor === floor && e.unit_no === unitNo));
+    if (found) {
+      // Format date nicely: "Apr 21, 2026"
+      const d = new Date(date);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+  }
+  return '—';
+}
+
+function toggleFloorDrill(btn) {
+  const panel = btn.nextElementSibling;
+  const isOpen = panel.classList.contains('open');
+  panel.classList.toggle('open', !isOpen);
+  btn.classList.toggle('open', !isOpen);
+  btn.querySelector('span') && (btn.querySelector('span').textContent = isOpen ? 'View all units' : 'Hide units');
+  // Update button text node (first text node)
+  const textNodes = [...btn.childNodes].filter(n => n.nodeType === 3);
+  if (textNodes.length) textNodes[textNodes.length-1].textContent = isOpen ? ' View all units' : ' Hide units';
 }
 
 // ===== PIE CHARTS =====
