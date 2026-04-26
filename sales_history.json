@@ -1,0 +1,82 @@
+{
+  "daily": {
+    "2026-03-29": {
+      "sold": [
+        {
+          "key": "5-2",
+          "floor": 5,
+          "unit_no": 2,
+          "unit_type": "2BHK",
+          "price": 1150000,
+          "ts": "10:00"
+        }
+      ],
+      "available": []
+    },
+    "2026-04-05": {
+      "sold": [
+        {
+          "key": "5-13",
+          "floor": 5,
+          "unit_no": 13,
+          "unit_type": "STUDIO",
+          "price": 634235,
+          "ts": "10:00"
+        }
+      ],
+      "available": []
+    },
+    "2026-04-08": {
+      "sold": [
+        {
+          "key": "5-14",
+          "floor": 5,
+          "unit_no": 14,
+          "unit_type": "2BHK",
+          "price": 1154988,
+          "ts": "10:00"
+        }
+      ],
+      "available": []
+    },
+    "2026-04-12": {
+      "sold": [
+        {
+          "key": "5-17",
+          "floor": 5,
+          "unit_no": 17,
+          "unit_type": "STUDIO",
+          "price": 629913,
+          "ts": "10:00"
+        }
+      ],
+      "available": []
+    },
+    "2026-04-16": {
+      "sold": [
+        {
+          "key": "5-20",
+          "floor": 5,
+          "unit_no": 20,
+          "unit_type": "STUDIO",
+          "price": 629913,
+          "ts": "10:00"
+        }
+      ],
+      "available": []
+    },
+    "2026-04-21": {
+      "sold": [
+        {
+          "key": "5-22",
+          "floor": 5,
+          "unit_no": 22,
+          "unit_type": "2BHK",
+          "price": 1358889,
+          "ts": "10:00"
+        }
+      ],
+      "available": []
+    }
+  }
+}
